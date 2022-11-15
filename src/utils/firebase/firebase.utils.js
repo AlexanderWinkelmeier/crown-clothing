@@ -1,10 +1,20 @@
 import { initializeApp } from 'firebase/app';
+// Für weitere Infos siehe
+// https://firebase.google.com/docs/web/setup?authuser=0&hl=de
+// https://firebase.google.com/docs/web/setup?authuser=0&hl=de
+// https://firebase.google.com/docs/web/setup#available-libraries
+// https://firebase.google.com/docs/reference/js/?authuser=0&hl=de
+
 import {
   getAuth,
   signInWithRedirect,
   signInWithPopup,
   GoogleAuthProvider,
 } from 'firebase/auth';
+
+// weitere Infos https://firebase.google.com/docs/auth/web/google-signin?authuser=0&hl=de
+
+import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -19,6 +29,9 @@ const firebaseConfig = {
 // Initialize Firebase
 
 const firebaseApp = initializeApp(firebaseConfig);
+// verknüpft die erstellte Instanz der App mit der Konfiguration
+// dadurch kann man mit seiner eigenen Instanz von Firebase interagieren;
+// hier: CRUD-Operations und Authentifizierung
 
 const provider = new GoogleAuthProvider();
 
@@ -28,3 +41,17 @@ provider.setCustomParameters({
 
 export const auth = getAuth();
 export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
+
+export const db = getFirestore();
+
+export const createUserDocumentFromAuth = async (userAuth) => {
+  const userDocRef = doc(db, 'users', userAuth.uid);
+  // Datenbank, Collection, eine unique ID (uid) aus der Authentifizierung
+
+  console.log(userDocRef);
+
+  const userSnapshot = await getDoc(userDocRef);
+
+  console.log(userSnapshot);
+  console.log(userSnapshot.exists());
+};
