@@ -5,8 +5,10 @@ import {
 
 const SignIn = () => {
   const logGoogleUser = async () => {
+    // sich mit Popup anmelden
     const { user } = await signInWithGooglePopup();
-    createUserDocumentFromAuth(user);
+    // eine userDocRef in Firestore erstellen
+    const userDocRef = await createUserDocumentFromAuth(user);
   };
 
   return (
