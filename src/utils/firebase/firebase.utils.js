@@ -38,15 +38,18 @@ const firebaseApp = initializeApp(firebaseConfig);
 // hier: CRUD-Operations und Authentifizierung
 
 // ! 6) Einen provider erstellen und diesen parametrisieren
-const provider = new GoogleAuthProvider();
+const googleProvider = new GoogleAuthProvider();
 
-provider.setCustomParameters({
+googleProvider.setCustomParameters({
   prompt: 'select_account',
 });
 
 // ! 7) Authenfizierung instanzieren und Sign-in-Methode wählen
 export const auth = getAuth();
-export const signInWithGooglePopup = () => signInWithPopup(auth, provider);
+export const signInWithGooglePopup = () =>
+  signInWithPopup(auth, googleProvider);
+export const signInWithGoogleRedirect = () =>
+  signInWithRedirect(auth, googleProvider);
 
 // ! 8) Firestore instanzieren
 export const db = getFirestore();
