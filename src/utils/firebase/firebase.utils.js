@@ -48,11 +48,12 @@ export const createUserDocumentFromAuth = async (
     const createdAt = new Date();
 
     try {
+      // Daten, die in Firestore gespeichert werden
       await setDoc(userDocRef, {
         displayName,
         email,
         createdAt,
-        ...additionalInformation,
+        ...additionalInformation, // Zusatzinfos, die createUserDocumentFromAuth übergeben werden; hier: displayName
       });
     } catch (error) {
       console.log('error creating the user', error.message);
