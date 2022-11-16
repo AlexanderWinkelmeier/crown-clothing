@@ -12,6 +12,7 @@ import {
   signInWithRedirect,
   signInWithPopup,
   GoogleAuthProvider,
+  createUserWithEmailAndPassword,
 } from 'firebase/auth';
 
 // weitere Infos https://firebase.google.com/docs/auth/web/google-signin?authuser=0&hl=de
@@ -56,6 +57,7 @@ export const db = getFirestore();
 
 // ! 9) Ein UserDocument in Firestore erstellen
 export const createUserDocumentFromAuth = async (userAuth) => {
+  if (!userAuth) return;
   const userDocRef = doc(db, 'users', userAuth.uid);
   // Datenbank, Collection, eine unique ID (uid) aus der Authentifizierung
 
@@ -79,4 +81,8 @@ export const createUserDocumentFromAuth = async (userAuth) => {
   }
 };
 
+export const createAuthUserWithEmailAndPassword = async (email, password) => {
+  if (!email || !password) return;
+  return await createAuthUserWithEmailAndPassword(auth, email, password);
+};
 // Anmerkung: die jeweiligen Variablen werden in sign-in-components importiert
