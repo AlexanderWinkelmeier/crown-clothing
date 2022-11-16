@@ -37,9 +37,18 @@ const SignInForm = () => {
         password
       );
       resetFormFields();
-      alert('You are signed in');
+      console.log({ user });
     } catch (error) {
-      console.log('your credentials are invalid', error);
+      switch (error.code) {
+        case 'auth/wrong-password':
+          alert('incorrect password for email');
+          break;
+        case 'auth/user-not-found':
+          alert('no user associated with this email');
+          break;
+        default:
+          console.log(error);
+      }
     }
   };
 
@@ -74,13 +83,12 @@ const SignInForm = () => {
 
         <div className="buttons-container">
           <Button type="submit">SIGN IN</Button>
-          <Button buttonType="google" onClick={signInWithGoogle}>
-            SIGN IN WITH GOOGLE
+          <Button type="button" buttonType="google" onClick={signInWithGoogle}>
+            GOOGLE SIGN IN
           </Button>
         </div>
       </form>
     </div>
   );
 };
-
 export default SignInForm;
