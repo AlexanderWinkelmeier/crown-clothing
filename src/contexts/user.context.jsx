@@ -12,3 +12,5 @@ export const UserProvider = ({ children }) => {
   const value = { currentUser, setCurrentUser };
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };
+
+// z.B. <UserProvider><App /><UserProvider/> in index.js
