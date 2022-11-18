@@ -28,6 +28,7 @@ const SignInForm = () => {
 
   const signInWithGoogle = async () => {
     const { user } = await signInWithGooglePopup();
+    // setCurrentUser(user);
     // eine userDocRef in Firestore erstellen
     await createUserDocumentFromAuth(user);
   };
@@ -62,6 +63,7 @@ const SignInForm = () => {
     const { name, value } = event.target;
 
     setFormFields({ ...formFields, [name]: value });
+    // setCurrentUser();
   };
 
   return (
