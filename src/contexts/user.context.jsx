@@ -25,6 +25,9 @@ export const UserProvider = ({ children }) => {
       setCurrentUser(user);
     });
     return unsubscribe;
+    // return wird in useEffect immer dann aufgerufen, wenn die Komponente unmounts
+    // es wird dann die Funktion ausgeführt, die hinter return steht; das ist die sog. clean-up-Function
+    // wenn die Komponente unmounts, wird der user nicht weiter observed, d.h. beobachtet
   }, []);
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

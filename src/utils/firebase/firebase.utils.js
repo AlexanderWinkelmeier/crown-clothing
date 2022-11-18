@@ -1,4 +1,4 @@
-import { initializeApp } from 'firebase/app';
+import { initializeApp, setLogLevel } from 'firebase/app';
 import {
   getAuth,
   signInWithRedirect,
@@ -82,3 +82,16 @@ export const signOutUser = async () => await signOut(auth);
 
 export const onAuthStateChangedListener = (callback) =>
   onAuthStateChanged(auth, callback);
+
+// onAuthStateChange ist ein Listener, der auf Änderungen von callback horcht
+// callback ist hier die sogenannte next-Methode bei Listenern, es können jedoch
+// auch mehr callback-Funktionen an onAuthStateChanged übergeben werden, d.h. dieser
+// Listener kann auch mehrere Events beobachten:
+// - error: horcht auf Fehler im Stream,
+// - completed: horcht darauf, wann der Stream beendet ist
+
+// {
+//   next: callback,
+//   error: errorCallback,
+//   complete: completeCallback
+// }
