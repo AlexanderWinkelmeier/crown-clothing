@@ -47,6 +47,7 @@ export const CartContext = createContext({
   clearItemFromCart: () => {},
   cartCount: 0,
   cartTotal: 0,
+  totalAmount: 0,
 });
 
 export const CartProvider = ({ children }) => {
@@ -82,6 +83,18 @@ export const CartProvider = ({ children }) => {
   const clearItemFromCart = (cartItemToClear) => {
     setCartItems(clearCartItem(cartItems, cartItemToClear));
   };
+
+  useEffect(() => {
+    const newCartTotal = cartItems.reduce(
+      // der accumulator, hier: total, ist das, auf was reduziert werden soll
+      // dieser accumulator wird sukzessive durch die Iteration über alle Elemente, hier: cartItems, verändert
+      // man nimmt das total des ersten Durchlaufs und berechnet durch Addition das neue total
+      // im zweiten Durchlauf nimmt man dies und berechnet das neue usw.
+      (total, cartItem) => total + cartItem.quantity * cartItem.price,
+      0
+    );
+    setCartTotal(newCartTotal);
+  }, [cartItems]);
 
   const value = {
     isCartOpen,
