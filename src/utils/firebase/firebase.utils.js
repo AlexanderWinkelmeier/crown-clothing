@@ -140,6 +140,7 @@ export const getCategoriesAndDocuments = async () => {
     return acc;
   }, {});
   return categoryMap;
+  // categoryMap ist ein object, kein Array!
 };
 
 // Struktur des json-Objekts = categoryMap
