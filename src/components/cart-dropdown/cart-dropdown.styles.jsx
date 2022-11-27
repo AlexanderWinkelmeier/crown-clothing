@@ -19,7 +19,7 @@ export const CartDropDownContainer = styled.div`
   right: 40px;
   z-index: 5;
 
-  /* wenn einer der drei Styled-Components sich in CartDropDownContainer befindet, so soll deren Style angewendet werden und margin-top: auto */
+  /* wenn einer der drei Styled-Components sich im CartDropDownContainer befindet, so soll deren Style angewendet werden und margin-top: auto */
   ${BaseButton},
   ${GoogleSignInButton}, ${InvertedButton} {
     margin-top: auto;
