@@ -17,7 +17,7 @@ export const CategoriesProvider = ({ children }) => {
     const getCategoriesMap = async () => {
       const categoryMap = await getCategoriesAndDocuments();
       // die categoryMap ist kein Array sondern ein object!
-      console.log(categoryMap);
+
       setCategoriesMap(categoryMap);
     };
     getCategoriesMap();
