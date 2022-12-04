@@ -16,6 +16,9 @@ export const USER_ACTION_TYPES = {
 };
 
 // ! REDUCER
+// ein Reducer nimmt den gegenwärtigen State und eine bestimmte action entgegen und
+// gibt einen neuen State abhängig von der action zurück: die action bestimmt, welchen Fall (case)
+// der Reducer auf den gegenwärtigen State anwenden soll
 const userReducer = (state, action) => {
   const { type, payload } = action;
 
@@ -32,6 +35,7 @@ const userReducer = (state, action) => {
 };
 
 // ! INITIAL STATE
+// der initial State ist der Ausgangs-State, der State mit dem beim Starten der App begonnen wird
 const INITIAL_STATE = {
   currentUser: null,
 };
@@ -39,12 +43,17 @@ const INITIAL_STATE = {
 export const UserProvider = ({ children }) => {
   // const [currentUser, setCurrentUser] = useState(null);
   // ! USEREDUCER-HOOK
-  const [{ currentUser }, dispatch] = useReducer(userReducer, INITIAL_STATE);
+  // dieser Hook nimmt die Reducer-Funktion und den initial State entgegen und gibt den neuen State und die
+  // dispatch-Funktion zurück
+  const [state, dispatch] = useReducer(userReducer, INITIAL_STATE);
+
+  const { currentUser } = state;
 
   // ! DISPATCHER
   const setCurrentUser = (user) => {
     dispatch({ type: USER_ACTION_TYPES.SET_CURRENT_USER, payload: user });
   };
+
   const value = { currentUser, setCurrentUser };
 
   useEffect(() => {
