@@ -37,6 +37,9 @@ const removeCartItem = (cartItems, cartItemToRemove) => {
   );
 };
 
+////////// ! VERWENDUNG EINES REDUCER //////////////
+
+// ! ACTION-TYPES
 const CART_ACTION_TYPES = {
   SET_IS_CART_OPEN: 'SET_IS_CART_OPEN',
   SET_CART_ITEMS: 'SET_CART_ITEMS',
@@ -44,6 +47,8 @@ const CART_ACTION_TYPES = {
   SET_CART_TOTAL: 'SET_CART_TOTAL',
 };
 
+// ! INITIAL STATE
+// enthält nur lesbare Werte!
 const INITIAL_STATE = {
   isCartOpen: false,
   cartItems: [],
@@ -51,6 +56,7 @@ const INITIAL_STATE = {
   cartTotal: 0,
 };
 
+// ! REDUCER
 const cartReducer = (state, action) => {
   const { type, payload } = action;
 
@@ -64,6 +70,8 @@ const cartReducer = (state, action) => {
       throw new Error(`Unhandled type ${type} in cartReducer`);
   }
 };
+
+////////////////// ! ENDE REDUCER ///////////////////////////////////
 
 const clearCartItem = (cartItems, cartItemToClear) =>
   cartItems.filter((cartItem) => cartItem.id !== cartItemToClear.id);
@@ -104,6 +112,7 @@ export const CartProvider = ({ children }) => {
       cartTotal: newCartTotal,
     };
 
+    // ! DISPATCH-FUNKTION
     dispatch(createAction(CART_ACTION_TYPES.SET_CART_ITEMS, payload));
   };
 
