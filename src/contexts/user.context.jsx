@@ -12,6 +12,7 @@ export const UserContext = createContext({
   currentUser: null,
 });
 
+// ! useReducer und seine Komponenten
 export const USER_ACTION_TYPES = {
   SET_CURRENT_USER: 'SET_CURRENT_USER',
 };
@@ -31,12 +32,16 @@ const userReducer = (state, action) => {
   }
 };
 
+// ! Provider
 export const UserProvider = ({ children }) => {
+  // ? useReducer
   const [{ currentUser }, dispatch] = useReducer(userReducer, INITIAL_STATE);
 
+  // ? Action-Creator, der eine Action, bestehend aus dem Action-Type und der Action-Payload, erzeugt (createAction) und dispatcht
   const setCurrentUser = (user) =>
     dispatch(createAction(USER_ACTION_TYPES.SET_CURRENT_USER, user));
 
+  // ? sorgt dafür, dass man einen User hat
   useEffect(() => {
     const unsubscribe = onAuthStateChangedListener((user) => {
       if (user) {

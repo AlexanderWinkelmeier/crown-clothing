@@ -15,6 +15,7 @@ import { setCurrentUser } from './store/user/user.action';
 
 const App = () => {
   const dispatch = useDispatch();
+  // ? sorgt dafür, dass man einen User hat
   useEffect(() => {
     const unsubscribe = onAuthStateChangedListener((user) => {
       if (user) {
