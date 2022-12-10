@@ -127,38 +127,8 @@ export const addCollectionAndDocuments = async (
 
 export const getCategoriesAndDocuments = async () => {
   const collectionRef = collection(db, 'categories');
-
   const q = query(collectionRef); // erstellt eine Anfrage an die jeweilige collection in db
-
-  const querySnapshot = await getDocs(q); // gibt einen Momentaufnahme der documents in dieser collection zurück
-
-  // Funktion, um die gewünschte Struktur der documents zu erreichen
-  // reduce ist eine gewöhnliche javascript-Methode für Arrays
-  const categoryMap = querySnapshot.docs.reduce((acc, docSnapshot) => {
-    const { title, items } = docSnapshot.data();
-    acc[title.toLowerCase()] = items;
-    return acc;
-  }, {});
-  return categoryMap;
-  // categoryMap ist ein object, kein Array!
+  const querySnapshot = await getDocs(q); // gibt eine Momentaufnahme der documents in dieser collection zurück
+  return querySnapshot.docs.map((docSnapshot) => docSnapshot.data());
+  //  gibt die Categories als Array zurück
 };
-
-// Struktur des json-Objekts = categoryMap
-/*
-{
-  hats: {
-    title: 'Hats',
-    items: [
-      {},
-      {}
-    ]
-  },
-  sneakers: {
-    title: 'Sneakers',
-    items: [
-      {},
-      {}
-    ]
-  }
-}
-*/
