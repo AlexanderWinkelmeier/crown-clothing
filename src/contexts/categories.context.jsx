@@ -24,9 +24,6 @@ export const CategoriesProvider = ({ children }) => {
   }, []);
 
   const value = { categoriesMap };
-  // useEffect(() => {
-  //   addCollectionAndDocuments('categories', SHOP_DATA);
-  // }, []);
 
   return (
     <CategoriesContext.Provider value={value}>
