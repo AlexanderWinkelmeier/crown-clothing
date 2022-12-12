@@ -1,8 +1,8 @@
 import { createSelector } from 'reselect';
 
-const selectCategoryReducer = (state) => state.categories; // State-Slice
+const selectCategoryReducer = (state) => state.categories; // State-Slice = "shop"
 
-// ! 1. Memoized Selektor
+// ! 1. Memoized Selektor --> checked, ob sich etwas im shop geändert hat
 export const selectCategories = createSelector(
   // Array bestehend aus Input-Selektoren:
   // welche Slices von Redux sollen verwendet werden, um einen Output zu erzeugen
@@ -16,7 +16,7 @@ export const selectCategories = createSelector(
 // Der memoized Selektor wird nur dann ausgeführt, wenn sich der Input-Selektor "selectCategoryReducer"
 // verändert hat, ansonsten nicht
 
-// ! 2. Memoized Selektor
+// ! 2. Memoized Selektor --> checked, ob sich etwas an den Kategorien geändert hat
 export const selectCategoriesMap = createSelector(
   [selectCategories], // hier ist der Input-Selektor, der obige memoized Selektor mit den categories-Array als Output
   // Output-Selektor

@@ -2,6 +2,9 @@ import { createContext, useState, useReducer } from 'react';
 
 import { createAction } from '../utils/reducer/reducer.utils';
 
+////////  ? Helper-Funktionen //////////////////////////////////////////////////
+
+// Hinzufügen eines selben Produkts zum Warenkorb, d.h. die Anzahl eines bestimmten Produkts um 1 erhöhen
 const addCartItem = (cartItems, productToAdd) => {
   const existingCartItem = cartItems.find(
     (cartItem) => cartItem.id === productToAdd.id
@@ -18,6 +21,8 @@ const addCartItem = (cartItems, productToAdd) => {
   return [...cartItems, { ...productToAdd, quantity: 1 }];
 };
 
+// Entfernen eines selben Produkts vom Warenkorb bzw. das letzte Produkt derselben Produkt-Sorte
+// aus dem Warenkorb entfernen, d.h. die Anzahl eines bestimmten Produkts um 1 vermindern
 const removeCartItem = (cartItems, cartItemToRemove) => {
   // find the cart item to remove
   const existingCartItem = cartItems.find(
@@ -36,6 +41,12 @@ const removeCartItem = (cartItems, cartItemToRemove) => {
       : cartItem
   );
 };
+
+// Die gesamte Produkt-Sorte, z.B. eine bestimmte Hose in ihrer Gesamtzahl, z.B. 4 aus dem Warenkorb entfernen
+const clearCartItem = (cartItems, cartItemToClear) =>
+  cartItems.filter((cartItem) => cartItem.id !== cartItemToClear.id);
+
+////////////////// ? Ende Helper-Funktionen //////////////////////////////////////////////
 
 ////////// ! VERWENDUNG EINES REDUCER //////////////
 
@@ -73,9 +84,9 @@ const cartReducer = (state, action) => {
 
 ////////////////// ! ENDE REDUCER ///////////////////////////////////
 
-const clearCartItem = (cartItems, cartItemToClear) =>
-  cartItems.filter((cartItem) => cartItem.id !== cartItemToClear.id);
+////////////////////// ? CONTEXT /////////////////////////////////////////////////////////////
 
+// initialer Context, d.h. Gesamt-State
 export const CartContext = createContext({
   isCartOpen: false,
   setIsCartOpen: () => {},
@@ -87,6 +98,7 @@ export const CartContext = createContext({
   cartTotal: 0,
 });
 
+// CartProvider
 export const CartProvider = ({ children }) => {
   const [isCartOpen, setIsCartOpen] = useState(false);
 
@@ -95,6 +107,11 @@ export const CartProvider = ({ children }) => {
     INITIAL_STATE
   );
 
+  // Aktualisiert die CartItems = (Produkte im Warenkorb) hinsichtlich:
+  // - ihrer Anzahl --> newCartCount
+  // - ihres Gesamtpreises --> newCartTotal
+  // Erstellt ein payload aus cartItems, cartCount und cartTotal
+  // Dispatched SET_CART_ITEMS mit dieser payload
   const updateCartItemsReducer = (cartItems) => {
     const newCartCount = cartItems.reduce(
       (total, cartItem) => total + cartItem.quantity,
@@ -144,3 +161,5 @@ export const CartProvider = ({ children }) => {
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 };
+
+//////////////// ? ENDE CONTEXT /////////////////////////////////////////////////////////////
