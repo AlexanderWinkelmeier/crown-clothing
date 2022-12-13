@@ -1,4 +1,6 @@
 import { compose, createStore, applyMiddleware } from 'redux';
+import { persistStore, persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
 // import logger from 'redux-logger';
 import { rootReducer } from './root-reducer';
 
@@ -30,8 +32,24 @@ const loggerMiddleware = (store) => (next) => (action) => {
   console.log('next State: ', store.getState());
 };
 
+const persistConfig = {
+  key: 'root', // wo soll gestartet werden: 'root' bedeutet, dass alles gespeichert werden soll
+  storage: storage, // wo soll gespeichert werden: im lokal storage des Browsers
+  blacklist: ['user'],
+  // welche Reducer-Werte sollen vom Speichern im Web-Browser ausgeschlossen werden: hier: 'user', d.h. die
+  // Werte des userReducer (vgl. root-reducer.js)
+};
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
 const middleWares = [loggerMiddleware];
 
 const composedEnhancers = compose(applyMiddleware(...middleWares));
 
-export const store = createStore(rootReducer, undefined, composedEnhancers);
+export const store = createStore(
+  persistedReducer,
+  undefined,
+  composedEnhancers
+);
+
+export const persistor = persistStore(store);
