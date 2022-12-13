@@ -1,36 +1,9 @@
 import { compose, createStore, applyMiddleware } from 'redux';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-// import logger from 'redux-logger';
+import logger from 'redux-logger';
+// import { loggerMiddleware } from './middleware/logger';
 import { rootReducer } from './root-reducer';
-
-// Currying
-// const curryFunc = (a) => (b, c) => {
-//    a + b - c
-// }
-
-// Helper-Funktionen, die wiederverwendbar sind:
-// const with3 = curryFunc(3)
-// const with10 = curryFunc(10)
-
-// with3(2,4) // 3 + 2 - 4
-// with10(2,9) // 3 + 2 - 9
-
-// selbst erstellte logger Middleware
-const loggerMiddleware = (store) => (next) => (action) => {
-  if (!action.type) {
-    next(action); // aktualisiert die Reducer im Redux-Store
-  }
-  // Action und previous State
-  console.log('type: ', action.type);
-  console.log('payload: ', action.payload);
-  console.log('currentState: ', store.getState());
-
-  next(action); // aktualisiert die Reducer im Redux-Store
-
-  // current State
-  console.log('next State: ', store.getState());
-};
 
 const persistConfig = {
   key: 'root', // wo soll gestartet werden: 'root' bedeutet, dass alles gespeichert werden soll
@@ -42,9 +15,20 @@ const persistConfig = {
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-const middleWares = [loggerMiddleware];
+const middleWares = [process.env.NODE_ENV !== 'production' && logger].filter(
+  Boolean
+); // Alternative: loggerMiddleware
+// die logger-Middleware soll nur im Entwicklungs-Modus verwendet werden und etwas in die Konsole loggen
 
-const composedEnhancers = compose(applyMiddleware(...middleWares));
+const composeEnhancer =
+  (process.env.NODE_ENV !== 'production' &&
+    window &&
+    window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) ||
+  compose;
+
+// wenn man sich im Entwickler-Modus befindet, es ein window-Objekt gibt und die REDUX-DEVTOOLS-Erweiterung existiert,
+// dann soll diese compose (Zusammenstellung) verwendet werden. Ansonsten verwende die compose von Redux
+const composedEnhancers = composeEnhancer(applyMiddleware(...middleWares));
 
 export const store = createStore(
   persistedReducer,
