@@ -9,8 +9,9 @@ import thunk from 'redux-thunk';
 const persistConfig = {
   key: 'root', // wo soll gestartet werden: 'root' bedeutet, dass alles gespeichert werden soll
   storage: storage, // wo soll gespeichert werden: im lokal storage des Browsers
-  blacklist: ['user'],
-  // welche Reducer-Werte sollen vom Speichern im Web-Browser ausgeschlossen werden: hier: 'user', d.h. die
+  whitelist: ['cart'], // nur der Warenkorb soll über Sessions hinweg gespeichert werden und beim Neuladen der Seite
+  // nicht gelöscht werden
+  // welche Reducer-Werte sollen vom Speicher im Web-Browser enthalten sein: hier: 'cart', d.h. die
   // Werte des userReducer (vgl. root-reducer.js)
 };
 

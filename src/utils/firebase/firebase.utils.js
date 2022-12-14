@@ -129,6 +129,7 @@ export const getCategoriesAndDocuments = async () => {
   // collectionRef --> Referenz (=Zeiger) auf die Collection categories in der Datenbank
   const collectionRef = collection(db, 'categories');
   const q = query(collectionRef); // erstellt eine Anfrage an die jeweilige collection in db
+
   const querySnapshot = await getDocs(q); // gibt eine Momentaufnahme der documents in dieser collection zurück
   return querySnapshot.docs.map((docSnapshot) => docSnapshot.data());
   //  gibt die Dokumente, d.h. Categories mit items und title, als Array zurück
