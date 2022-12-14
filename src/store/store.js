@@ -4,6 +4,7 @@ import storage from 'redux-persist/lib/storage';
 import logger from 'redux-logger';
 // import { loggerMiddleware } from './middleware/logger';
 import { rootReducer } from './root-reducer';
+import thunk from 'redux-thunk';
 
 const persistConfig = {
   key: 'root', // wo soll gestartet werden: 'root' bedeutet, dass alles gespeichert werden soll
@@ -15,10 +16,11 @@ const persistConfig = {
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-const middleWares = [process.env.NODE_ENV !== 'production' && logger].filter(
-  Boolean
-); // Alternative: loggerMiddleware
-// die logger-Middleware soll nur im Entwicklungs-Modus verwendet werden und etwas in die Konsole loggen
+const middleWares = [
+  process.env.NODE_ENV !== 'production' && logger,
+  thunk,
+].filter(Boolean); // Alternative: loggerMiddleware
+// die logger-Middleware und Thunk-Middleware sollen nur im Entwicklungs-Modus verwendet werden und etwas in die Konsole loggen
 
 const composeEnhancer =
   (process.env.NODE_ENV !== 'production' &&
