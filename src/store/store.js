@@ -4,7 +4,9 @@ import storage from 'redux-persist/lib/storage';
 import logger from 'redux-logger';
 // import { loggerMiddleware } from './middleware/logger';
 import { rootReducer } from './root-reducer';
-import thunk from 'redux-thunk';
+// import thunk from 'redux-thunk';
+import createSagaMiddleware from '@redux-saga';
+import { rootSaga } from './root-saga';
 
 const persistConfig = {
   key: 'root', // wo soll gestartet werden: 'root' bedeutet, dass alles gespeichert werden soll
@@ -15,11 +17,13 @@ const persistConfig = {
   // Werte des userReducer (vgl. root-reducer.js)
 };
 
+const sagaMiddleware = createSagaMiddleware();
+
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 const middleWares = [
   process.env.NODE_ENV !== 'production' && logger,
-  thunk,
+  sagaMiddleware,
 ].filter(Boolean); // Alternative: loggerMiddleware
 // die logger-Middleware und Thunk-Middleware sollen nur im Entwicklungs-Modus verwendet werden und etwas in die Konsole loggen
 
@@ -39,4 +43,5 @@ export const store = createStore(
   composedEnhancers
 );
 
+sagaMiddleware.run(rootSaga);
 export const persistor = persistStore(store);
