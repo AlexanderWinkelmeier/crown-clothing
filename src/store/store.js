@@ -5,7 +5,7 @@ import logger from 'redux-logger';
 // import { loggerMiddleware } from './middleware/logger';
 import { rootReducer } from './root-reducer';
 // import thunk from 'redux-thunk';
-import createSagaMiddleware from '@redux-saga';
+import createSagaMiddleware from 'redux-saga';
 import { rootSaga } from './root-saga';
 
 const persistConfig = {
