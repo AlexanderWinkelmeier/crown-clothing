@@ -5,6 +5,7 @@ import logger from 'redux-logger';
 // import { loggerMiddleware } from './middleware/logger';
 import { rootReducer } from './root-reducer';
 // import thunk from 'redux-thunk';
+// ? SAGA-Middleware und rootSaga importieren
 import createSagaMiddleware from 'redux-saga';
 import { rootSaga } from './root-saga';
 
@@ -17,10 +18,11 @@ const persistConfig = {
   // Werte des userReducer (vgl. root-reducer.js)
 };
 
+// ? SAGA-Middleware instanzieren
 const sagaMiddleware = createSagaMiddleware();
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
-
+// ? SAGA-Middleware in das Middleware-Array einfügen
 const middleWares = [
   process.env.NODE_ENV !== 'production' && logger,
   sagaMiddleware,
@@ -43,5 +45,6 @@ export const store = createStore(
   composedEnhancers
 );
 
+// ? SAGA-Middleware mit der rootSaga starten
 sagaMiddleware.run(rootSaga);
 export const persistor = persistStore(store);

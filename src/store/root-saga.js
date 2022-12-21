@@ -5,3 +5,5 @@ import { categoriesSaga } from './categories/categories-saga';
 export function* rootSaga() {
   yield all([call(categoriesSaga)]);
 }
+
+// ruft alle SAGAs im Array der SAGAs auf
