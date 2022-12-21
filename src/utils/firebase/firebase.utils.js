@@ -92,7 +92,8 @@ export const signOutUser = async () => await signOut(auth);
 export const onAuthStateChangedListener = (callback) =>
   onAuthStateChanged(auth, callback);
 
-// onAuthStateChange ist ein Listener, der auf Änderungen von callback horcht
+// onAuthStateChange ist ein Listener, der auf Änderungen von callback horcht,
+// hier: auf den State des User, d.h. ob der User eingeloggt ist oder nicht
 // callback ist hier die sogenannte next-Methode bei Listenern, es können jedoch
 // auch mehr callback-Funktionen an onAuthStateChanged übergeben werden, d.h. dieser
 // Listener kann auch mehrere Events beobachten:
@@ -142,3 +143,16 @@ export const getCategoriesAndDocuments = async () => {
 // Collection --> categories
 // Dokumente --> hats, jackets, mens, womens, sneakers
 // Felder, hier: Category --> "items" mit Unter-Feldern und "title"
+
+export const getCurrentUser = () => {
+  return new Promise((resolve, reject) => {
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (userAuth) => {
+        unsubscribe();
+        resolve(userAuth);
+      },
+      reject
+    );
+  });
+};

@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import {
   onAuthStateChangedListener,
   createUserDocumentFromAuth,
+  getCurrentUser,
 } from './utils/firebase/firebase.utils.js';
 
 import { Routes, Route } from 'react-router-dom';
@@ -17,14 +18,14 @@ const App = () => {
   const dispatch = useDispatch();
   // ? sorgt dafür, dass man einen User hat
   useEffect(() => {
-    const unsubscribe = onAuthStateChangedListener((user) => {
-      if (user) {
-        createUserDocumentFromAuth(user);
-      }
-      dispatch(setCurrentUser(user));
-    });
-
-    return unsubscribe;
+    // const unsubscribe = onAuthStateChangedListener((user) => {
+    //   if (user) {
+    //     createUserDocumentFromAuth(user);
+    //   }
+    //   dispatch(setCurrentUser(user));
+    // });
+    // return unsubscribe;
+    getCurrentUser().then((user) => console.log('Signed User', user));
   }, [dispatch]); // dispatch ändert sich nie, kann daher auch weggelassen werden
 
   return (
