@@ -1,53 +1,102 @@
 import { takeLatest, all, call, put } from 'redux-saga/effects';
-
 import { USER_ACTION_TYPES } from './user.types';
-
 import { signInSuccess, signInFailed } from './user.action';
-
 import {
   getCurrentUser,
   createUserDocumentFromAuth,
+  signInWithGooglePopup,
+  signInAuthUserWithEmailAndPassword,
 } from '../../utils/firebase/firebase.utils';
 
+// ? ###################   CHECK USER SESSION   #########################################
+
 // 4)
+// "Worker-Saga 2": holt Daten vom Benutzer
 export function* getSnapshotFromUserAuth(userAuth, additionalDetails) {
   try {
     const userSnapShot = yield call(
-      createUserDocumentFromAuth,
+      createUserDocumentFromAuth, // --> Firebase
       userAuth,
       additionalDetails
     );
-    yield put(signInSuccess({ id: userSnapShot.id, ...userSnapShot.data() }));
+    yield put(signInSuccess({ id: userSnapShot.id, ...userSnapShot.data() })); // --> Reducer
   } catch (error) {
-    yield put(signInFailed(error));
+    yield put(signInFailed(error)); // --> Reducer
   }
 }
-// 3) "Worker-Saga"
+// 3) "Worker-Saga 1": prüft, ob der Benutzer angemeldet ist
 export function* isUserAuthenticated() {
   try {
-    const userAuth = yield call(getCurrentUser);
+    const userAuth = yield call(getCurrentUser); // --> firebase
     if (!userAuth) return;
-    yield call(getSnapshotFromUserAuth, userAuth);
+    yield call(getSnapshotFromUserAuth, userAuth); // --> "Worker-Saga 2"
   } catch (error) {
-    yield put(signInFailed(error));
+    yield put(signInFailed(error)); // --> Reducer
   }
 }
 
-// 2) "Watcher-Saga", die auf "CHECK_USER_SESSION" horcht, die in app.js in useEffect dispatched wird
+// 2) "Watcher-Saga A", die auf "CHECK_USER_SESSION" horcht, die in app.js in useEffect dispatched wird
 export function* onCheckUserSession() {
-  yield takeLatest(USER_ACTION_TYPES.CHECK_USER_SESSION, isUserAuthenticated);
+  yield takeLatest(USER_ACTION_TYPES.CHECK_USER_SESSION, isUserAuthenticated); // --> "Worker-Saga 1"
+}
+// ? ##################      END CHECK USER SESSION   ###############################################################
+
+// * ############################### SIGN IN WITH GOOGLE ################################
+
+// c) "Worker-Saga I"
+export function* signInWithGoogle() {
+  try {
+    const { user } = yield call(signInWithGooglePopup); // --> firebase
+    yield call(getSnapshotFromUserAuth, user); // --> "Worker-Saga 2"
+  } catch (error) {
+    yield put(signInFailed(error)); // --> Reducer
+  }
 }
 
+// b) "Watcher-Saga B", die auf "GOOGLE_SIGN_IN_START" horcht, die sich in sign-in-form-component.jsx befindet
+export function* onGoogleSignInStart() {
+  yield takeLatest(USER_ACTION_TYPES.GOOGLE_SIGN_IN_START, signInWithGoogle); // -- "Worker-Saga I"
+}
+
+// * ###############   END SIGN IN WITH GOOGLE ##############################################
+
+// ! ############## SIGN IN WITH E-MAIL AND PASSWORD ##############################
+
+// z) "Worker-Saga alpha"
+
+export function* signInWithEmail({ payload: { email, password } }) {
+  try {
+    const { user } = yield call(
+      signInAuthUserWithEmailAndPassword,
+      email,
+      password
+    ); // --> firebase
+    yield call(getSnapshotFromUserAuth, user); // --> "Worker-Saga 2"
+  } catch (error) {
+    yield put(signInFailed(error)); // --> Reducer
+  }
+}
+
+// y) "Watcher-Saga X", die auf "EMAIL_SIGN_IN_START" horcht, die sich in sign-in-form-component.jsx befindet
+export function* onEmailSignInStart() {
+  yield takeLatest(USER_ACTION_TYPES.EMAIL_SIGN_IN_START, signInWithEmail); // --> "Worker-Saga alpha"
+}
+
+// ! ############## END SIGN IN WITH E-MAIL AND PASSWORD ##############################
 // 5)
 export function* userSagas() {
-  yield all([onCheckUserSession]);
+  yield all([
+    call(onCheckUserSession),
+    call(onGoogleSignInStart),
+    call(onEmailSignInStart),
+  ]);
 }
 
-// Ablauf:
+// Ablauf "CHECK USER SESSION"
 // 1) siehe App.js: hier wird CHECK_USER_SESSION dispatched
-// 2) "Watcher-SAGA" nimmt davon die letzte Action entgegen und
-//     gibt an isUserAuthenticated, der "Worker-Saga" weiter
-// 3) "Worker-SAGA":
+// 2) "Watcher-Saga A" nimmt davon die letzte Action entgegen und
+//     gibt an isUserAuthenticated, der "Worker-Saga 2" weiter
+// 3) "Worker-Saga 2":
 //     - ruft getCurrentUser in firebase.utils.js auf:
 //       gibt authentifizierten User zurück oder nicht
 //     - existiert ein authentifizierter User:
@@ -55,3 +104,15 @@ export function* userSagas() {
 // 4) gibt Snapshot, d.h. Daten, von User zurück oder nicht
 //  wenn Daten kommen --> weiterleiten an den Reducer mittels put
 // 5) übergibt akkumulierte Saga an rootSaga
+
+//  Ablauf SIGN IN WITH GOOGLE
+// a) siehe sign-in-form.component.js: hier wird GOOGLE_SIGN_IN_START dispatched
+// b) "Watcher-Saga B" nimmt davon die letzte Action entgegen und
+//     gibt an isUserAuthenticated, der "Worker-Saga I" weiter:
+//  diese dann an "Worker Saga 2" bzw. den Reducer
+// ansonsten wie oben
+
+// Ablauf SIGN IN WITH E-MAIL AND PASSWORD
+// i) siehe sign-in-form.component.js: hier wird EMAIL_SIGN_IN_START dispatched
+// ii) "Watcher-SAGA X" nimmt davon die letzte Action entgegen und
+//     gibt an  "Worker-Saga alpha" weiter usw.
