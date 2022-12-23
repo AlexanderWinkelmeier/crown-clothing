@@ -1,11 +1,17 @@
 import { takeLatest, all, call, put } from 'redux-saga/effects';
 import { USER_ACTION_TYPES } from './user.types';
-import { signInSuccess, signInFailed } from './user.action';
+import {
+  signInSuccess,
+  signInFailed,
+  signUpSuccess,
+  signUpFailed,
+} from './user.action';
 import {
   getCurrentUser,
   createUserDocumentFromAuth,
   signInWithGooglePopup,
   signInAuthUserWithEmailAndPassword,
+  createAuthUserWithEmailAndPassword,
 } from '../../utils/firebase/firebase.utils';
 
 // ? ###################   CHECK USER SESSION   #########################################
@@ -83,12 +89,46 @@ export function* onEmailSignInStart() {
 }
 
 // ! ############## END SIGN IN WITH E-MAIL AND PASSWORD ##############################
+
+// ? ############### SIGN UP ####################################################
+
+// "Worker-Saga"
+export function* signInAfterSignUp({ payload: { user, additionalDetails } }) {
+  yield call(getSnapshotFromUserAuth, user, additionalDetails); // --> "Worker-Saga 2"
+}
+
+// "Watcher-Saga"
+export function* onSignUpSuccess() {
+  yield takeLatest(USER_ACTION_TYPES.SIGN_UP_SUCCESS, signInAfterSignUp);
+}
+
+// "Worker-Saga"
+export function* signUp({ payload: { email, password, displayName } }) {
+  try {
+    const { user } = yield call(
+      createAuthUserWithEmailAndPassword, // --> firebase
+      email,
+      password
+    );
+    yield put(signUpSuccess(user, { displayName })); // --> User-Saga, nicht Reducer!
+  } catch (error) {
+    yield put(signUpFailed(error)); // --> User-Saga, nicht Reducer!
+  }
+}
+// "Watcher-Saga"
+export function* onSignUpStart() {
+  yield takeLatest(USER_ACTION_TYPES.SIGN_UP_START, signUp);
+}
+// ? ############### END SIGN UP ####################################################
+
 // 5)
 export function* userSagas() {
   yield all([
     call(onCheckUserSession),
     call(onGoogleSignInStart),
     call(onEmailSignInStart),
+    call(onSignUpStart),
+    call(onSignUpSuccess),
   ]);
 }
 
