@@ -1,13 +1,22 @@
+// Aus firebase werden Funktionen von:
+// - 'firebase/app', --> zum generellen  Verbinden von firebase mit dem Frontend, also react
+// - 'firebase/auth' und --> zum Verbinden vom Modul Auth mit dem Frontend
+// - 'firebase/firestore' --> zum Verbinden des Firestore mit dem Frontend
+// importiert
+// ? Importe
 import { initializeApp } from 'firebase/app';
 import {
   getAuth,
+  //Google
+  GoogleAuthProvider, // ist eine Klasse
   signInWithRedirect,
   signInWithPopup,
-  GoogleAuthProvider,
+  //Email/Password
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  // #############
   signOut,
-  onAuthStateChanged,
+  onAuthStateChanged, // Auth-State-Listener
 } from 'firebase/auth';
 
 import {
@@ -18,9 +27,10 @@ import {
   collection, // braucht man, um in firestore eine collection erstellen zu können
   writeBatch, // benötigt man, um Daten als Batch, d.h. in einem Aufwisch, in die Datenbank zu schreiben
   query, // benötigt man, um Anfragen bezüglich collections an die Datenbank firestore stellen zu können
-  getDocs, // benötigt man, um documents aus firestore abrufe zu könnnen
+  getDocs, // benötigt man, um documents aus firestore abrufen zu könnnen
 } from 'firebase/firestore';
 
+//  ? Konfigurations-Objekt
 const firebaseConfig = {
   apiKey: 'AIzaSyAneN1I5VRbdj7RWeYsmm-ek97Hpjn2tn8',
   authDomain: 'crown-clothing-db-232d2.firebaseapp.com',
@@ -30,36 +40,45 @@ const firebaseConfig = {
   appId: '1:657132211133:web:c7118034314973930820d4',
 };
 
-const firebaseApp = initializeApp(firebaseConfig);
+//  ? Firebase App initialisieren
+initializeApp(firebaseConfig);
 
+// ? Services initialisieren
+export const auth = getAuth();
+// Mit Firestore-Datenbank verbinden
+export const db = getFirestore();
+
+//  ! AUTHENTIFIZIERUNG
+
+// * 1) mit Google
 const googleProvider = new GoogleAuthProvider();
-
 googleProvider.setCustomParameters({
   prompt: 'select_account',
 });
+// man wird in der UI aufgefordert, ein Konto von Google zum Einloggen auszuwählen
 
-export const auth = getAuth();
+// 1. Methode, sich mit Google anzumelden
 export const signInWithGooglePopup = () =>
   signInWithPopup(auth, googleProvider);
+// 2. Methode, sich mit Google anzumelden
 export const signInWithGoogleRedirect = () =>
   signInWithRedirect(auth, googleProvider);
 
-export const db = getFirestore();
-
+// Anlegen eines Benutzers in Firebase
 export const createUserDocumentFromAuth = async (
-  userAuth,
+  userAuth, // zu registrierender User
   additionalInformation = {}
 ) => {
-  if (!userAuth) return;
+  if (!userAuth) return; // wenn kein User eingegeben wurde --> Abbruch des Codes!
 
-  const userDocRef = doc(db, 'users', userAuth.uid);
+  const userDocRef = doc(db, 'users', userAuth.uid); // Anlegen Dokuments einer 'users'-Collection
 
-  const userSnapshot = await getDoc(userDocRef);
+  const userSnapshot = await getDoc(userDocRef); // Momentaufnahme (= aktueller Zustatand) des Dokuments
 
   if (!userSnapshot.exists()) {
     const { displayName, email } = userAuth;
     const createdAt = new Date();
-
+    // Erstellung eines Users als Dokument
     try {
       await setDoc(userDocRef, {
         displayName,
@@ -75,6 +94,7 @@ export const createUserDocumentFromAuth = async (
   return userDocRef;
 };
 
+// * 2) mit E-Mail-Adresse und Passwort
 export const createAuthUserWithEmailAndPassword = async (email, password) => {
   if (!email || !password) return;
 
@@ -89,22 +109,31 @@ export const signInAuthUserWithEmailAndPassword = async (email, password) => {
 
 export const signOutUser = async () => await signOut(auth);
 
+// Auth-State-Listener, der Änderungen im Status des aktuell sich auf der Seite
+// befindlichen User (hier:als callback bezeichnet) achtet, d.h. ob er von eingeloggt zu ausgeloggt wechsel, umgekehrt
+// oder von nicht registriert zu registriert wechselt
+// diese Funktion gibt eine Variable zurück, bei deren Aufruf das Abo an diesen Listener
+// wieder beendet wird, d.h. dieser Listener nicht mehr auf Auth-State-Änderungen achtet
 export const onAuthStateChangedListener = (callback) =>
   onAuthStateChanged(auth, callback);
 
-// onAuthStateChange ist ein Listener, der auf Änderungen von callback horcht,
-// hier: auf den State des User, d.h. ob der User eingeloggt ist oder nicht
-// callback ist hier die sogenannte next-Methode bei Listenern, es können jedoch
-// auch mehr callback-Funktionen an onAuthStateChanged übergeben werden, d.h. dieser
-// Listener kann auch mehrere Events beobachten:
-// - error: horcht auf Fehler im Stream,
-// - completed: horcht darauf, wann der Stream beendet ist
+// Alternativer Ansatz als Promise-Variante
 
-// {
-//   next: callback,
-//   error: errorCallback,
-//   complete: completeCallback
-// }
+// Listener, der Authorisierungs-Änderungen beobachtet: onAuthStateChanged
+export const getCurrentUser = () => {
+  return new Promise((resolve, reject) => {
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (userAuth) => {
+        unsubscribe(); // deabonniert die Beobachtung
+        resolve(userAuth);
+      },
+      reject
+    );
+  });
+};
+
+// !FIRESTORE
 
 // Funktion, um eine collection anzulegen und die dazugehörigen documents darin einzufügen
 export const addCollectionAndDocuments = async (
@@ -143,16 +172,3 @@ export const getCategoriesAndDocuments = async () => {
 // Collection --> categories
 // Dokumente --> hats, jackets, mens, womens, sneakers
 // Felder, hier: Category --> "items" mit Unter-Feldern und "title"
-
-export const getCurrentUser = () => {
-  return new Promise((resolve, reject) => {
-    const unsubscribe = onAuthStateChanged(
-      auth,
-      (userAuth) => {
-        unsubscribe();
-        resolve(userAuth);
-      },
-      reject
-    );
-  });
-};

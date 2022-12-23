@@ -16,15 +16,17 @@ import { setCurrentUser } from './store/user/user.action';
 
 const App = () => {
   const dispatch = useDispatch();
-  // ? sorgt dafür, dass man einen User hat
+  // ? überprüft, ob es gegenwärtig einen angemeldeten User gibt
   useEffect(() => {
+    // abonniert einen Auth-State-Listener
     // const unsubscribe = onAuthStateChangedListener((user) => {
     //   if (user) {
-    //     createUserDocumentFromAuth(user);
+    //     createUserDocumentFromAuth(user);//--> Firebase
     //   }
-    //   dispatch(setCurrentUser(user));
+    //   dispatch(setCurrentUser(user)); --> Redux-Store
     // });
-    // return unsubscribe;
+    // return unsubscribe; // --> de-abonniert den Auth-State-Listener wieder
+    // Alternative: Promise-Ansatz wegen Redux-Saga
     getCurrentUser().then((user) => console.log('Signed User', user));
   }, [dispatch]); // dispatch ändert sich nie, kann daher auch weggelassen werden
 
