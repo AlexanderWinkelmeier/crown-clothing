@@ -71,9 +71,9 @@ export const createUserDocumentFromAuth = async (
 ) => {
   if (!userAuth) return; // wenn kein User eingegeben wurde --> Abbruch des Codes!
 
-  const userDocRef = doc(db, 'users', userAuth.uid); // Anlegen Dokuments einer 'users'-Collection
+  const userDocRef = doc(db, 'users', userAuth.uid); // Anlegen Dokuments einer 'users'-Collection: Pointer
 
-  const userSnapshot = await getDoc(userDocRef); // Momentaufnahme (= aktueller Zustatand) des Dokuments
+  const userSnapshot = await getDoc(userDocRef); // Momentaufnahme (= aktueller Zustatand) des Dokuments: Daten
 
   if (!userSnapshot.exists()) {
     const { displayName, email } = userAuth;
@@ -91,7 +91,7 @@ export const createUserDocumentFromAuth = async (
     }
   }
 
-  return userDocRef;
+  return userSnapshot;
 };
 
 // * 2) mit E-Mail-Adresse und Passwort
