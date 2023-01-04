@@ -5,3 +5,6 @@ const enum CATEGORIES_ACTION_TYPES {
 }
 
 export default CATEGORIES_ACTION_TYPES;
+
+// Durch enum werden die drei Types nicht nur Strings, sondern  nur
+// diese ganz spezifischen Strings
