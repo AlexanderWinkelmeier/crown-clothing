@@ -1,11 +1,15 @@
+// ? Datei aus ACTIONS, die an den Reducer dispatched werden, bestehend jeweils aus
+// dem Action Type und evtl. einem Payload
+
 import { CATEGORIES_ACTION_TYPES, Category } from './categories.types';
 import {
-  createAction,
-  Action,
-  ActionWithPayload,
+  createAction, // Funktion, die eine Action erstellt
+  Action, // ohne Payload
+  ActionWithPayload, // mit Payload
 } from '../../utils/reducer/reducer.utils';
 
-// !Typisierung der Action-Creators
+// !Datentypen der drei Action-Creators
+// d.h. welche Datentypen sollen jeweils für die drei Action Types verwendet werden
 export type FetchCategoriesStart =
   Action<CATEGORIES_ACTION_TYPES.FETCH_CATEGORIES_START>;
 
@@ -20,12 +24,14 @@ export type FetchCategoriesFailed = ActionWithPayload<
 >;
 
 // Union der drei typisierten Action-Types --> in den Categories-Reducer
+// Union heisst, dass sie sich jeweils gegenseitig ausschließen: es kann immer
+// nur ein Datentyp verwendet werden
 export type CategoryAction =
   | FetchCategoriesStart
   | FetchCategoriesSuccess
   | FetchCategoriesFailed;
 
-// ! synchrone Action-Creators
+// ! Typisierung der drei synchronen Action-Creators
 export const fetchCategoriesStart = (): FetchCategoriesStart =>
   createAction(CATEGORIES_ACTION_TYPES.FETCH_CATEGORIES_START);
 

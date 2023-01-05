@@ -28,6 +28,7 @@ export const selectCategoriesMap = createSelector(
       acc[title.toLowerCase()] = items;
       return acc;
     }, {} as CategoryMap)
+  // Type Assertion: der Compiler wird gezwungen {} als vom Datentyp CategoryMap zu betrachten
 );
 
 // Hier wird ein Array (state.categories.categories) in ein JavaScript-Objekt (map) transformiert:
@@ -36,6 +37,12 @@ export const selectCategoriesMap = createSelector(
 // JavaScript-Objekt
 
 // Struktur des json-Objekts = categoryMap
+
+export const selectCategoriesIsLoading = createSelector(
+  [selectCategoryReducer],
+  (categoriesSlice) => categoriesSlice.isLoading
+);
+
 /*
 {
   hats: {
@@ -54,8 +61,3 @@ export const selectCategoriesMap = createSelector(
   }
 }
 */
-
-export const selectCategoriesIsLoading = createSelector(
-  [selectCategoryReducer],
-  (categoriesSlice) => categoriesSlice.isLoading
-);
