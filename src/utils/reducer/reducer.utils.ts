@@ -1,9 +1,52 @@
+import { match } from 'assert';
 import { AnyAction } from 'redux';
 
 type Matchable<AC extends () => AnyAction> = AC & {
   type: ReturnType<AC>['type'];
   match(action: AnyAction): action is ReturnType<AC>;
 };
+
+// AC:
+// ist der jeweilige Action-Creator, d.h. eine Funktion die AnyAction zurückgibt
+
+// ReturnType<AC>:
+// Datentyp, den der jeweilige Action-Creator zurückgibt --> return { type, payload }; siehe unten
+
+// ReturnType<AC>['type']:
+// Datentyp, den der jeweilige Action-Creator bei 'type' zurückgibt --> return {type, payload}
+
+// match()-Methode:
+// nimmt jegliche Action (AnyAction) entgegen, kann aber nur vom
+// ReturnType des ActionCreators sein
+// ist eine Predicate-Funktion, die nur true oder false zurückgibt
+
+// Funktionsweise diese Datentyps Matchable:
+// vergleicht eine ankommende Action mit Action-Type und verengt den
+// Datentyp der action auf den ReturnType des Action-Creators:
+// ist quasi ein Filter, der nur actions vom Datentyp der Action-Creators durchlässt
+
+// ?Funktions-Overloading
+// Action-Creator ohne Parameter
+export function withMatcher<AC extends () => AnyAction & { type: string }>(
+  actionCreator: AC
+): Matchable<AC>;
+
+// Action-Creator mit Parameter
+export function withMatcher<
+  AC extends (...args: any[]) => AnyAction & { type: string }
+>(actionCreator: AC): Matchable<AC>;
+
+// ?Basis-Funktion: die Implementation
+
+export function withMatcher(actionCreator: Function) {
+  const type = actionCreator().type;
+  return Object.assign(actionCreator, {
+    type,
+    match(action: AnyAction) {
+      return action.type === type;
+    },
+  });
+}
 
 // generische Datentypen: Action mit Payload und Action ohne Payload
 export type ActionWithPayload<T, P> = {
