@@ -36,7 +36,7 @@ export function withMatcher<
   AC extends (...args: any[]) => AnyAction & { type: string }
 >(actionCreator: AC): Matchable<AC>;
 
-// ?Basis-Funktion: die Implementation
+// ? Basis-Funktion: die Implementation
 
 export function withMatcher(actionCreator: Function) {
   const type = actionCreator().type;

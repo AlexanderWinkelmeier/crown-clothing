@@ -6,6 +6,7 @@ import {
   createAction, // Funktion, die eine Action erstellt
   Action, // ohne Payload
   ActionWithPayload, // mit Payload
+  withMatcher,
 } from '../../utils/reducer/reducer.utils';
 
 // !Datentypen der drei Action-Creators
@@ -23,24 +24,20 @@ export type FetchCategoriesFailed = ActionWithPayload<
   Error
 >;
 
-// Union der drei typisierten Action-Types --> in den Categories-Reducer
-// Union heisst, dass sie sich jeweils gegenseitig ausschließen: es kann immer
-// nur ein Datentyp verwendet werden
-export type CategoryAction =
-  | FetchCategoriesStart
-  | FetchCategoriesSuccess
-  | FetchCategoriesFailed;
-
 // ! Typisierung der drei synchronen Action-Creators
-export const fetchCategoriesStart = (): FetchCategoriesStart =>
-  createAction(CATEGORIES_ACTION_TYPES.FETCH_CATEGORIES_START);
+export const fetchCategoriesStart = withMatcher(
+  (): FetchCategoriesStart =>
+    createAction(CATEGORIES_ACTION_TYPES.FETCH_CATEGORIES_START)
+);
 
-export const fetchCategoriesSuccess = (
-  categoriesArray: Category[]
-): FetchCategoriesSuccess =>
-  createAction(
-    CATEGORIES_ACTION_TYPES.FETCH_CATEGORIES_SUCCESS,
-    categoriesArray
-  );
-export const fetchCategoriesFailed = (error: Error): FetchCategoriesFailed =>
-  createAction(CATEGORIES_ACTION_TYPES.FETCH_CATEGORIES_FAILED, error);
+export const fetchCategoriesSuccess = withMatcher(
+  (categoriesArray: Category[]): FetchCategoriesSuccess =>
+    createAction(
+      CATEGORIES_ACTION_TYPES.FETCH_CATEGORIES_SUCCESS,
+      categoriesArray
+    )
+);
+export const fetchCategoriesFailed = withMatcher(
+  (error: Error): FetchCategoriesFailed =>
+    createAction(CATEGORIES_ACTION_TYPES.FETCH_CATEGORIES_FAILED, error)
+);
