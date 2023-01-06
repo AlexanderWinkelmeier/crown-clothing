@@ -1,45 +1,48 @@
-import { match } from 'assert';
+import { Action } from '@remix-run/router';
 import { AnyAction } from 'redux';
 
+// Datentyp Matchable: eine Erweiterung zu einem Action-Creator
 type Matchable<AC extends () => AnyAction> = AC & {
   type: ReturnType<AC>['type'];
+  // predicate function, die die action auf den ReturnType des Action-Creator einengt
   match(action: AnyAction): action is ReturnType<AC>;
 };
 
 // AC:
-// ist der jeweilige Action-Creator, d.h. eine Funktion die AnyAction zurückgibt
+// ist der jeweilige Action-Creator, z.B. fetchCategory Start
 
 // ReturnType<AC>:
-// Datentyp, den der jeweilige Action-Creator zurückgibt --> return { type, payload }; siehe unten
+// Datentyp, den der jeweilige Action-Creator zurückgibt, z.B. CATEGORIES_ACTION_TYPES.FETCH_CATEGORIES_START
 
 // ReturnType<AC>['type']:
 // Datentyp, den der jeweilige Action-Creator bei 'type' zurückgibt --> return {type, payload}
+// z.B. 'categories/FETCH_CATEGORIES_START'
 
 // match()-Methode:
-// nimmt jegliche Action (AnyAction) entgegen, kann aber nur vom
-// ReturnType des ActionCreators sein
-// ist eine Predicate-Funktion, die nur true oder false zurückgibt
+// ist eine Predicate-Funktion
+// nimmt jegliche Action (AnyAction) entgegen und verengt dabei auf den
+// ReturnType des ActionCreators, d.h. gibt immer nur diesen Datentyp zurück
 
 // Funktionsweise diese Datentyps Matchable:
 // vergleicht eine ankommende Action mit Action-Type und verengt den
 // Datentyp der action auf den ReturnType des Action-Creators:
 // ist quasi ein Filter, der nur actions vom Datentyp der Action-Creators durchlässt
 
-// ?Funktions-Overloading
+// ?Funktions-Overloading: Typisierung der withMatcher-Funktion
 // Action-Creator ohne Parameter
 export function withMatcher<AC extends () => AnyAction & { type: string }>(
   actionCreator: AC
 ): Matchable<AC>;
 
-// Action-Creator mit Parameter
+// Action-Creator mit Parameter (...args: any[])
 export function withMatcher<
   AC extends (...args: any[]) => AnyAction & { type: string }
 >(actionCreator: AC): Matchable<AC>;
 
-// ? Basis-Funktion: die Implementation
+// ? Basis-Funktion: die Implementation der withMatcher-Funktion
 
 export function withMatcher(actionCreator: Function) {
-  const type = actionCreator().type;
+  const type = actionCreator().type; // type des actionCreators
   return Object.assign(actionCreator, {
     type,
     match(action: AnyAction) {
@@ -47,6 +50,17 @@ export function withMatcher(actionCreator: Function) {
     },
   });
 }
+
+// nimmt die actionCreator-Funktion entgegen und returned dieselbe mit ihrem action.type
+// andere Actions werden ausgefiltert
+// Object.assign(target, ...quellen): wird verwendet, um die quellen mit dem target
+// zu verschmelzen: Rückgabe ist das target
+// hier: target: actionCreator
+//       quelle: {
+// type,
+// match(action: AnyAction) {
+//   return action.type === type;
+// }
 
 // generische Datentypen: Action mit Payload und Action ohne Payload
 export type ActionWithPayload<T, P> = {
