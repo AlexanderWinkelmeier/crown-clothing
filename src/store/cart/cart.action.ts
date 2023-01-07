@@ -6,6 +6,8 @@ import {
 } from '../../utils/reducer/reducer.utils';
 import { CategoryItem } from '../categories/categories.types';
 
+// ? Helper-Functions
+
 const addCartItem = (
   cartItems: CartItem[],
   productToAdd: CategoryItem
