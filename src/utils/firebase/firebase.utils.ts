@@ -17,6 +17,8 @@ import {
   // #############
   signOut,
   onAuthStateChanged, // Auth-State-Listener
+  User,
+  NextOrObserver,
 } from 'firebase/auth';
 
 import {
@@ -28,7 +30,10 @@ import {
   writeBatch, // benötigt man, um Daten als Batch, d.h. in einem Aufwisch, in die Datenbank zu schreiben
   query, // benötigt man, um Anfragen bezüglich collections an die Datenbank firestore stellen zu können
   getDocs, // benötigt man, um documents aus firestore abrufen zu könnnen
+  QueryDocumentSnapshot,
 } from 'firebase/firestore';
+
+import { Category } from '../../store/categories/categories.types';
 
 //  ? Konfigurations-Objekt
 const firebaseConfig = {
@@ -65,10 +70,21 @@ export const signInWithGoogleRedirect = () =>
   signInWithRedirect(auth, googleProvider);
 
 // Anlegen eines Benutzers in Firebase
+
+export type AdditionalInformation = {
+  displayName?: string;
+};
+
+export type UserData = {
+  createdAt: Date;
+  displayName: string;
+  email: string;
+};
+
 export const createUserDocumentFromAuth = async (
-  userAuth, // zu registrierender User
-  additionalInformation = {}
-) => {
+  userAuth: User, // zu registrierender User, das User-Object
+  additionalInformation = {} as AdditionalInformation
+): Promise<void | QueryDocumentSnapshot<UserData>> => {
   if (!userAuth) return; // wenn kein User eingegeben wurde --> Abbruch des Codes!
 
   const userDocRef = doc(db, 'users', userAuth.uid); // Anlegen Dokuments einer 'users'-Collection: Pointer
@@ -87,21 +103,27 @@ export const createUserDocumentFromAuth = async (
         ...additionalInformation,
       });
     } catch (error) {
-      console.log('error creating the user', error.message);
+      console.log('error creating the user', error);
     }
   }
 
-  return userSnapshot;
+  return userSnapshot as QueryDocumentSnapshot<UserData>;
 };
 
 // * 2) mit E-Mail-Adresse und Passwort
-export const createAuthUserWithEmailAndPassword = async (email, password) => {
+export const createAuthUserWithEmailAndPassword = async (
+  email: string,
+  password: string
+) => {
   if (!email || !password) return;
 
   return await createUserWithEmailAndPassword(auth, email, password);
 };
 
-export const signInAuthUserWithEmailAndPassword = async (email, password) => {
+export const signInAuthUserWithEmailAndPassword = async (
+  email: string,
+  password: string
+) => {
   if (!email || !password) return;
 
   return await signInWithEmailAndPassword(auth, email, password);
@@ -114,13 +136,13 @@ export const signOutUser = async () => await signOut(auth);
 // oder von nicht registriert zu registriert wechselt
 // diese Funktion gibt eine Variable zurück, bei deren Aufruf das Abo an diesen Listener
 // wieder beendet wird, d.h. dieser Listener nicht mehr auf Auth-State-Änderungen achtet
-export const onAuthStateChangedListener = (callback) =>
+export const onAuthStateChangedListener = (callback: NextOrObserver<User>) =>
   onAuthStateChanged(auth, callback);
 
 // Alternativer Ansatz als Promise-Variante
 
 // Listener, der Authorisierungs-Änderungen beobachtet: onAuthStateChanged
-export const getCurrentUser = () => {
+export const getCurrentUser = (): Promise<User | null> => {
   return new Promise((resolve, reject) => {
     const unsubscribe = onAuthStateChanged(
       auth,
@@ -135,12 +157,15 @@ export const getCurrentUser = () => {
 
 // !FIRESTORE
 
+export type ObjectToAdd = {
+  title: string;
+};
+
 // Funktion, um eine collection anzulegen und die dazugehörigen documents darin einzufügen
-export const addCollectionAndDocuments = async (
-  collectionKey, // Bezeichnung der collection; hier: Categories
-  objectsToAdd, // die zugehörigen documents; hier: das gesamte Json-Objekt SHOP_DATA aus shop-data.js
-  field = 'title'
-) => {
+export const addCollectionAndDocuments = async <T extends ObjectToAdd>(
+  collectionKey: string, // Bezeichnung der collection, die man hinzufügen möchte; hier: Categories
+  objectsToAdd: T[] // die zugehörigen documents; hier: das gesamte Json-Objekt SHOP_DATA aus shop-data.js
+): Promise<void> => {
   // die collectionRef ist der Pointer auf die collection in der Datenbank; gibt es diese collection noch nicht, so
   //  wird sie automatisch angelegt
   const collectionRef = collection(db, collectionKey);
@@ -148,20 +173,22 @@ export const addCollectionAndDocuments = async (
 
   // die Objekte mit der Bezeichnung field, hier: der jeweilige title (hats, sneakers...) in Kleinbuchstaben in die Datenbank mit dem collectionKey categories hochladen
   objectsToAdd.forEach((object) => {
-    const docRef = doc(collectionRef, object[field].toLowerCase());
+    const docRef = doc(collectionRef, object.title.toLowerCase());
     batch.set(docRef, object);
   });
   await batch.commit();
   console.log('done');
 };
 
-export const getCategoriesAndDocuments = async () => {
+export const getCategoriesAndDocuments = async (): Promise<Category[]> => {
   // collectionRef --> Referenz (=Zeiger) auf die Collection categories in der Datenbank
   const collectionRef = collection(db, 'categories');
   const q = query(collectionRef); // erstellt eine Anfrage an die jeweilige collection in db
 
   const querySnapshot = await getDocs(q); // gibt eine Momentaufnahme der documents in dieser collection zurück
-  return querySnapshot.docs.map((docSnapshot) => docSnapshot.data());
+  return querySnapshot.docs.map(
+    (docSnapshot) => docSnapshot.data() as Category
+  );
   //  gibt die Dokumente, d.h. Categories mit items und title, als Array zurück
 };
 
