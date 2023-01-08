@@ -11,7 +11,7 @@ import {
 } from '../../utils/firebase/firebase.utils';
 import { User } from 'firebase/auth';
 
-// * Typisierung der Action-Creators (s.u.) und wrapping mit withMatcher
+// * Typisierung der Action-Creators (s.u.)
 
 export type CheckUserSession = Action<USER_ACTION_TYPES.CHECK_USER_SESSION>;
 
@@ -57,6 +57,8 @@ export type SignOutFailed = ActionWithPayload<
 >;
 
 // ! Action-Creators, die ein Action-Objekt, bestehend aus dem Action-Type und eventuell der Action-Payload, erzeugt (createAction)
+
+// * Angabe der Datentypen und mit withMatcher wrappen
 
 export const checkUserSession = withMatcher(
   (): CheckUserSession => createAction(USER_ACTION_TYPES.CHECK_USER_SESSION)

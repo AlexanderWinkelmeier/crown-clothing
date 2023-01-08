@@ -24,3 +24,12 @@ export const selectCartTotal = createSelector([selectCartItems], (cartItems) =>
     0
   )
 );
+
+// Anmerkungen zu createSelector von 'reselect':
+// Eine Bibliothek zur Erstellung von memoisierten "Selektor"-Funktionen. Häufig mit Redux verwendet, aber verwendbar mit jeder einfachen JS unveränderliche Daten als gut.
+
+// Selektoren können abgeleitete Daten berechnen, so dass Redux den minimal möglichen Zustand speichern kann.
+// Selektoren sind effizient. Ein Selektor wird nicht neu berechnet, es sei denn, eines seiner Argumente ändert sich.
+// Selektoren sind komponierbar. Sie können als Eingabe für andere Selektoren verwendet werden.
+
+// --> https://github.com/reduxjs/reselect
