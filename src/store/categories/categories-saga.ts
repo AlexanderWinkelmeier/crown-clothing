@@ -1,4 +1,4 @@
-import { takeLatest, call, put, all } from 'redux-saga/effects';
+import { takeLatest, call, put, all } from 'typed-redux-saga';
 
 import { getCategoriesAndDocuments } from '../../utils/firebase/firebase.utils';
 
@@ -7,23 +7,26 @@ import {
   fetchCategoriesFailed,
 } from './categories.action';
 
-import CATEGORIES_ACTION_TYPES from './categories.types';
+import { CATEGORIES_ACTION_TYPES } from './categories.types';
 
 // ? Handler Function der "Watcher"-SAGA
 export function* fetchCategoriesAsync() {
   try {
-    const categoriesArray = yield call(getCategoriesAndDocuments, 'categories');
+    const categoriesArray = yield* call(
+      getCategoriesAndDocuments,
+      'categories'
+    );
     // ruft die Funktion getCategories... mit dem Argument 'categories' auf
-    yield put(fetchCategoriesSuccess(categoriesArray)); // Übergabe der Action an den Reducer
+    yield* put(fetchCategoriesSuccess(categoriesArray)); // Übergabe der Action an den Reducer
   } catch (error) {
-    yield put(fetchCategoriesFailed(error)); // Übergabe der Action an den Reducer
+    yield* put(fetchCategoriesFailed(error as Error)); // Übergabe der Action an den Reducer
   }
 }
 // ? "Watcher"-SAGA
 // watched den CATEGORIES_ACTION_TYPES "FETCH_CATEGORIES_START"
 // nimmt von all diesen Actions nur die letzte und ruft die "Worker" SAGA fetchCategoriesAsync auf
 export function* onFetchCategories() {
-  yield takeLatest(
+  yield* takeLatest(
     CATEGORIES_ACTION_TYPES.FETCH_CATEGORIES_START,
     fetchCategoriesAsync
   );
@@ -36,7 +39,7 @@ export function* onFetchCategories() {
 
 // ? Akkumulator-SAGA: enthält alle SAGAs der Datei und wird der rootSaga übergeben
 export function* categoriesSaga() {
-  yield all([call(onFetchCategories)]); // rufe alle SAGAs in dieser Datei auf; hier: nur onFetchCategories
+  yield* all([call(onFetchCategories)]); // rufe alle SAGAs in dieser Datei auf; hier: nur onFetchCategories
 }
 
 // jede Generator-Funktion antwortet auf Actions

@@ -1,4 +1,3 @@
-import { Action } from '@remix-run/router';
 import { AnyAction } from 'redux';
 
 // Datentyp Matchable: eine Erweiterung zu einem Action-Creator
