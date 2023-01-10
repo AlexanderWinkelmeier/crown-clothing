@@ -8,6 +8,8 @@ import {
   signOutSuccess,
   signOutFailed,
   EmailSignInStart,
+  SignUpStart,
+  SignUpSuccess,
 } from './user.action';
 import {
   getCurrentUser,
@@ -113,7 +115,9 @@ export function* onEmailSignInStart() {
 // ? ############### SIGN UP ####################################################
 
 // "Worker-Saga"
-export function* signInAfterSignUp({ payload: { user, additionalDetails } }) {
+export function* signInAfterSignUp({
+  payload: { user, additionalDetails },
+}: SignUpSuccess) {
   yield* call(getSnapshotFromUserAuth, user, additionalDetails); // --> "Worker-Saga 2"
 }
 
@@ -123,16 +127,21 @@ export function* onSignUpSuccess() {
 }
 
 // "Worker-Saga"
-export function* signUp({ payload: { email, password, displayName } }) {
+export function* signUp({
+  payload: { email, password, displayName },
+}: SignUpStart) {
   try {
-    const { user } = yield* call(
+    const userCredential = yield* call(
       createAuthUserWithEmailAndPassword, // --> firebase
       email,
       password
     );
-    yield* put(signUpSuccess(user, { displayName })); // --> User-Saga, nicht Reducer!
+    if (userCredential) {
+      const { user } = userCredential;
+      yield* put(signUpSuccess(user, { displayName })); // --> User-Saga, nicht Reducer!
+    }
   } catch (error) {
-    yield* put(signUpFailed(error)); // --> User-Saga, nicht Reducer!
+    yield* put(signUpFailed(error as Error)); // --> User-Saga, nicht Reducer!
   }
 }
 // "Watcher-Saga"
@@ -149,7 +158,7 @@ export function* signOut() {
     yield* call(signOutUser); // --> firebase
     yield* put(signOutSuccess()); // --> Reducer
   } catch (error) {
-    yield* put(signOutFailed(error)); // --> Reducer
+    yield* put(signOutFailed(error as Error)); // --> Reducer
   }
 }
 
