@@ -1,3 +1,5 @@
+import { FC, ButtonHTMLAttributes } from 'react';
+
 import {
   BaseButton,
   GoogleSignInButton,
@@ -5,15 +7,15 @@ import {
   LoadingSpinner,
 } from './button.styles';
 
-export const BUTTON_TYPE_CLASSES = {
-  base: 'base',
-  google: 'google-sign-in',
-  inverted: 'inverted',
-};
+export enum BUTTON_TYPE_CLASSES {
+  base = 'base',
+  google = 'google-sign-in',
+  inverted = 'inverted',
+}
 
-// Eine Hilfs-Funktion, der man den ButtonType übergibt und dann einen der drei ButtonComponents (Button-Styles) zurückerhält
+// Eine Hilfs-Funktion, der man den ButtonType übergibt und dann EINEN der drei ButtonComponents (Button-Styles) zurückerhält
 
-const getButton = (buttonType = BUTTON_TYPE_CLASSES.base) =>
+const getButton = (buttonType = BUTTON_TYPE_CLASSES.base): typeof BaseButton =>
   ({
     [BUTTON_TYPE_CLASSES.base]: BaseButton,
     [BUTTON_TYPE_CLASSES.google]: GoogleSignInButton,
@@ -26,7 +28,17 @@ const getButton = (buttonType = BUTTON_TYPE_CLASSES.base) =>
 // hier unter buttonType
 // übergibt man der Funktion z.B. BUTTON_TYPE_CLASSES.google erhält man den GoogleSignInButton zurück
 
-const Button = ({ children, buttonType, isLoading = false, ...otherProps }) => {
+export type ButtonProps = {
+  buttonType?: BUTTON_TYPE_CLASSES;
+  isLoading?: boolean;
+} & ButtonHTMLAttributes<HTMLButtonElement>;
+
+const Button: FC<ButtonProps> = ({
+  children,
+  buttonType,
+  isLoading = false,
+  ...otherProps
+}) => {
   const CustomButton = getButton(buttonType);
   return (
     <CustomButton disabled={isLoading} {...otherProps}>
