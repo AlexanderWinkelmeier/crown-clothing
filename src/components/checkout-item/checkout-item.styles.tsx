@@ -1,12 +1,13 @@
 import styled from 'styled-components';
 
 export const ImageContainer = styled.div`
-   width: 23%;
-    padding-right: 15px;
+  width: 23%;
+  padding-right: 15px;
 
-    img {
-      width: 100%;
-      height: 100%;
+  img {
+    width: 100%;
+    height: 100%;
+  }
 `;
 
 export const RemoveButton = styled.div`
@@ -38,6 +39,10 @@ export const CheckOutItemContainer = styled.div`
   padding: 15px 0;
   font-size: 20px;
   align-items: center;
+
+  @media screen and (max-width: 800px) {
+    font-size: 16px;
+  }
 
   .quantity {
     display: flex;
