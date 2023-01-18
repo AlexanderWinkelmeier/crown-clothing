@@ -5,7 +5,7 @@ import {
   BackgroundImage,
   Body,
   DirectoryItemContainer,
-} from './category-item.styles';
+} from './directory-item.styles';
 
 import { DirectoryCategory } from '../directory/directory.component';
 

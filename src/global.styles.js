@@ -9,7 +9,7 @@ export const GlobalStyle = createGlobalStyle`
   -moz-osx-font-smoothing: grayscale;
 
   @media screen and (max-width: 800px){
-    padding:
+    padding:0px;
   }
 }
 
