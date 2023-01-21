@@ -12,6 +12,8 @@ import { store, persistor } from './store/store';
 
 import { GlobalStyle } from './global.styles';
 
+import * as serviceWorkerRegistration from './serviceWorkerRegistration';
+
 const rootElement = document.getElementById('root');
 
 render(
@@ -29,3 +31,5 @@ render(
   </React.StrictMode>,
   rootElement
 );
+
+serviceWorkerRegistration.register();
