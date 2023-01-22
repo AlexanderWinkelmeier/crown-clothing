@@ -38,13 +38,6 @@ export const ProductCartContainer = styled.div`
     position: absolute;
     top: 255px;
     display: none;
-
-    @media screen and (max-width: 800px) {
-      display: block;
-      opacity: 0.9;
-      min-width: unset;
-      padding: 0 10px;
-    }
   }
 
   &:hover {
@@ -59,7 +52,7 @@ export const ProductCartContainer = styled.div`
   }
 
   @media screen and (max-width: 800px) {
-    /* width: 40vw;  I personally found this wasn't necessary */
+    width: 40vw;
 
     button {
       display: block;
@@ -77,5 +70,9 @@ export const ProductCartContainer = styled.div`
         opacity: unset;
       }
     }
+  }
+
+  @media screen and (max-width: 400px) {
+    width: 80vw;
   }
 `;

@@ -10,8 +10,6 @@ import { stripePromise } from './utils/stripe/stripe.utils';
 import App from './App';
 import { store, persistor } from './store/store';
 
-import { GlobalStyle } from './global.styles';
-
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 
 const rootElement = document.getElementById('root');
@@ -23,7 +21,6 @@ render(
         <BrowserRouter>
           <Elements stripe={stripePromise}>
             <App />
-            <GlobalStyle />
           </Elements>
         </BrowserRouter>
       </PersistGate>

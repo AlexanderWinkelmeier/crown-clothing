@@ -16,8 +16,14 @@ export const Preview = styled.div`
   @media screen and (max-width: 800px) {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px;
-    margin: 0px 15px;
+    grid-column-gap: 15px;
+    grid-row-gap: 25px;
+  }
+
+  @media screen and (max-width: 400px) {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-row-gap: 25px;
   }
 `;
 export const CategoryPreviewContainer = styled.div`
